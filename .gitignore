@@ -1,3 +1,18 @@
-# Dile a Git que ignore la carpeta del entorno virtual
+# Entorno virtual
 env/
 venv/
+ENV/
+
+# Python basura
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Archivos de diseño/sistema
+.DS_Store
+Thumbs.db
+
+# Modelos pesados (si tu modelo .pkl o .joblib pesa más de 100MB, es mejor no subirlo a GitHub)
+modelo_gradient_boosting.pkl
+# *.joblib

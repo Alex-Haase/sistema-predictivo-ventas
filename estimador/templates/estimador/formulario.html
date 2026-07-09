@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estimador de Ventas - Capstone</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f2f5; padding: 20px; margin: 0; }
+        .container { max-width: 700px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin: 20px auto; }
+        h2 { color: #1a73e8; text-align: center; margin-top: 0; }
+        p.subtitle { text-align: center; color: #666; margin-bottom: 25px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group.full-width { grid-column: span 2; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: #444; font-size: 14px; }
+        input[type="number"], select { width: 100%; padding: 10px; border: 1px solid #cccccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        input:focus, select:focus { border-color: #1a73e8; outline: none; box-shadow: 0 0 5px rgba(26,115,232,0.2); }
+        button { width: 100%; padding: 14px; background-color: #1a73e8; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; transition: background 0.3s; }
+        button:hover { background-color: #1557b0; }
+        #resultado { margin-top: 25px; padding: 15px; border-radius: 6px; text-align: center; font-size: 18px; display: none; }
+        .success { background-color: #e6f4ea; color: #137333; border: 1px solid #c2e7cb; }
+        .error { background-color: #fce8e6; color: #c5221f; border: 1px solid #fad2cf; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Sistema Predictivo de Ventas</h2>
+    <p class="subtitle">Modelo Gradient Boosting Integrado</p>
+    
+    <form id="predictionForm" method="POST">
+        {% csrf_token %}
+        <div class="grid">
+            <div class="form-group">
+                <label for="latitud">Latitud:</label>
+                <input type="number" step="any" name="latitud" id="latitud" required value="-33.5">
+            </div>
+            <div class="form-group">
+                <label for="longitud">Longitud:</label>
+                <input type="number" step="any" name="longitud" id="longitud" required value="-70.6">
+            </div>
+
+            <div class="form-group">
+                <label for="superficie_m2">Superficie (m²):</label>
+                <input type="number" step="any" name="superficie_m2" id="superficie_m2" required>
+            </div>
+            <div class="form-group">
+                <label for="trabajadores">Cantidad de Trabajadores:</label>
+                <input type="number" name="trabajadores" id="trabajadores" required>
+            </div>
+
+            <div class="form-group">
+                <label for="distancia_plaza_metros">Distancia a la Plaza (metros):</label>
+                <input type="number" step="any" name="distancia_plaza_metros" id="distancia_plaza_metros" required>
+            </div>
+            <div class="form-group">
+                <label for="distancia_metro_metros">Distancia al Metro (metros):</label>
+                <input type="number" step="any" name="distancia_metro_metros" id="distancia_metro_metros" required>
+            </div>
+
+            <div class="form-group">
+                <label for="flujo_personas_diario">Flujo Diario de Personas:</label>
+                <input type="number" name="flujo_personas_diario" id="flujo_personas_diario" required>
+            </div>
+            <div class="form-group">
+                <label for="poblacion_radio_1km">Población (Radio 1km):</label>
+                <input type="number" name="poblacion_radio_1km" id="poblacion_radio_1km" required>
+            </div>
+            <div class="form-group">
+                <label for="competencia_directa">Competidores Directos:</label>
+                <input type="number" name="competencia_directa" id="competencia_directa" required>
+            </div>
+            <div class="form-group">
+                <label for="estacionamientos">Estacionamientos Disponibles:</label>
+                <input type="number" name="estacionamientos" id="estacionamientos" required>
+            </div>
+
+            <div class="form-group">
+                <label for="ingreso_promedio_hogar">Ingreso Promedio Hogar (CLP):</label>
+                <input type="number" name="ingreso_promedio_hogar" id="ingreso_promedio_hogar" required>
+            </div>
+            <div class="form-group">
+                <label for="marketing_mensual">Inversión Marketing Mensual (CLP):</label>
+                <input type="number" name="marketing_mensual" id="marketing_mensual" required>
+            </div>
+
+            <div class="form-group">
+                <label for="comuna">Comuna:</label>
+                <select name="comuna" id="comuna" required>
+                    <option value="">Selecciona...</option>
+                    <option value="La Florida">La Florida</option>
+                    <option value="La Pintana">La Pintana</option>
+                    <option value="Pirque">Pirque</option>
+                    <option value="Otra">Otra Comuna</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="tipo_negocio">Tipo de Negocio:</label>
+                <select name="tipo_negocio" id="tipo_negocio" required>
+                    <option value="">Selecciona...</option>
+                    <option value="Restaurante">Restaurante</option>
+                    <option value="Retail">Retail</option>
+                    <option value="Servicios">Servicios</option>
+                    <option value="Tecnologia">Tecnología</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+            <div class="form-group full-width">
+                <label for="zona">Zona de Importancia:</label>
+                <select name="zona" id="zona" required>
+                    <option value="">Selecciona...</option>
+                    <option value="Baja">Baja</option>
+                    <option value="Media">Media</option>
+                    <option value="Alta">Alta / Otra</option>
+                </select>
+            </div>
+        </div>
+        
+        <button type="submit">Calcular Estimación de Ventas</button>
+    </form>
+
+    <div id="resultado"></div>
+</div>
+
+<script>
+    // Código Javascript para enviar el formulario mediante AJAX sin recargar la página
+    document.getElementById('predictionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultadoDiv = document.getElementById('resultado');
+        
+        resultadoDiv.style.display = 'block';
+        resultadoDiv.className = 'success';
+        resultadoDiv.innerHTML = 'Calculando predicción...';
+
+        fetch('', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.ventas_estimadas !== undefined) {
+                resultadoDiv.className = 'success';
+                resultadoDiv.innerHTML = `<strong>Predicción de Ventas Mensuales:</strong> $${data.ventas_estimadas.toLocaleString('es-CL')} CLP`;
+            } else if (data.error) {
+                resultadoDiv.className = 'error';
+                resultadoDiv.innerHTML = `<strong>Error:</strong> ${data.error}`;
+            }
+        })
+        .catch(error => {
+            resultadoDiv.className = 'error';
+            resultadoDiv.innerHTML = '<strong>Error en la conexión con el servidor.</strong>';
+        });
+    });
+</script>
+
+</body>
+</html>
+
+</body>
+</html>

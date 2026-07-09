@@ -77,11 +77,14 @@ WSGI_APPLICATION = 'motor_predictivo.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.oracle',
+        'USER': 'system',
+        'PASSWORD': 'Alex.1323',  # <-- Pon tu clave real de Oracle
+        'NAME': 'XE',                  # <-- El nombre exacto que está READY en tu máquina
+        'HOST': '127.0.0.1',
+        'PORT': '1521',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
